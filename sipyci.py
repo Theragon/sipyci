@@ -13,14 +13,6 @@ repopath='/home/ru/NetCrawler'	#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
 gitdir='/home/logan/gitrepos/NetCrawler/.git'
 
-def handler(signum, frame):
-	print '\nSignal handler called with signal', signum
-	print 'Shutting down server'
-	s.close()
-	sys.exit()
-
-signal.signal(signal.SIGINT, handler)
-
 #git --work-tree=/repo/path --git-dir=/repo/path/.git pull origin master
 #gitPull = 'git --work-tree='+repopath+' --git-dir='+repopath+'/.git pull origin master'	#This is for ru.dev.lab
 gitPull = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
@@ -35,6 +27,7 @@ s.bind((host,port))
 s.listen(backlog)
 
 def main():
+
 	while 1:
 		client, address = s.accept()
 		data = client.recv(size)
@@ -49,10 +42,15 @@ def main():
 
 		client.close()
 
-client.close()
+	s.close()
 
-#subprocess.call(gitPull, shell=True)
-s.close()
+def handler(signum, frame):
+	print '\nSignal handler called with signal', signum
+	print 'Shutting down server'
+	s.close()
+	sys.exit()
+
+signal.signal(signal.SIGINT, handler)
 
 
 if __name__ == '__main__':
