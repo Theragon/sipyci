@@ -123,6 +123,9 @@ def parseBuffer(buff):
 	#print json.dumps(payload)
 	pprint(payload)
 
+	for key, value in d.iteritems():
+		print key, value
+
 
 def handler(signum, frame):
 	print '\nSignal handler called with signal', signum
