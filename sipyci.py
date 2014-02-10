@@ -5,6 +5,7 @@ A simple python CI server
 
 run example: ./sipyci port=90 path=/home/user/repo/
 run example: ./sipyci path=/full/path/to/repo
+This is a test
 """
 
 import signal
