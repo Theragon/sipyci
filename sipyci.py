@@ -58,8 +58,6 @@ def parseInput(args):
 	foundpath = False
 	foundport = False
 
-	print(foundpath)
-
 	for arg in sys.argv:
 		print(arg)
 		if(arg == sys.argv[0]):
