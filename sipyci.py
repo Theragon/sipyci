@@ -116,7 +116,7 @@ def parseBuffer(buff):
 
 	print('payload: ' + str(buff[payloadPos+8:]))
 	payload = buff[payloadPos+8:]
-	payload = urllib.parse.unquote(payload)
+	payload = urllib.unquote(payload)
 	json.loads(payload)
 	print json.dumps(payload)
 
