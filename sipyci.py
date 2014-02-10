@@ -4,6 +4,7 @@
 A simple python CI server
 
 run example: ./sipyci port=90 path=/home/user/repo/
+run example: ./sipyci path=/full/path/to/repo
 """
 
 import signal
@@ -23,11 +24,15 @@ gitPull = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
 host = ''		# '' means any address the machine happens to have
 #port = 5000
 backlog = 5
-size = 4096
+size = 1024
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 def main():
+	"""
+	Main function
+	parses input and enters a while true loop
+	"""
 	path = ''
 	port = 5000
 
@@ -36,7 +41,7 @@ def main():
 		print('path to repo is: ' + path)
 	else:
 		print('you must provide a path to repo')
-		sys.exit(1)
+#		sys.exit(1)
 
 
 	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have
@@ -48,6 +53,10 @@ def main():
 		client, address = s.accept()
 		data = client.recv(size)
 
+
+		print('client: ' + str(client))
+		print('address: ' + str(address))
+
 		if data:
 			print(data + 'end of data')
 			print('length of data: ' + str(len(data)))
@@ -55,6 +64,7 @@ def main():
 			if (data[0:4] == 'pull'):			# This should change later when git hooks are used
 				print('Pulling from git...')
 				subprocess.call(gitPull, shell=True)
+			client.close()
 
 		client.close()
 
