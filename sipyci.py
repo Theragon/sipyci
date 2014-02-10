@@ -13,6 +13,7 @@ import socket
 import sys
 import subprocess
 import json
+import urllib
 
 repopath='/home/ru/NetCrawler'	#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
@@ -115,6 +116,7 @@ def parseBuffer(buff):
 
 	print('payload: ' + str(buff[payloadPos+8:]))
 	payload = buff[payloadPos+8:]
+	payload = urllib.parse.unquote(payload)
 	json.loads(payload)
 	print json.dumps(payload)
 
