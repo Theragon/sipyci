@@ -123,7 +123,7 @@ def parseBuffer(buff):
 	#print json.dumps(payload)
 	pprint(payload)
 
-	for key, value in d.iteritems():
+	for key, value in payload.iteritems():
 		print key, value
 
 
