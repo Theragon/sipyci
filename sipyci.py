@@ -12,6 +12,7 @@ import signal
 import socket
 import sys
 import subprocess
+import json
 
 repopath='/home/ru/NetCrawler'	#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
@@ -112,7 +113,12 @@ def receiveData(client, address):
 
 def parseBuffer(buff):
 	payloadPos = buff.find('payload=')
-	print('found payload at position: ' + str(payloadPos))
+	print('found payload at position: ' + str(payloadPos+8))
+
+	print('payload: ' + str(buff[payloadPos+8:]))
+	payload = buff[payloadPos+8:]
+	json.loads(payload)
+	print json.dumps(payload)
 
 
 def handler(signum, frame):
