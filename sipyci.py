@@ -114,10 +114,11 @@ def parseBuffer(buff):
 	payloadPos = buff.find('payload=')
 	print('found payload at position: ' + str(payloadPos+8))
 
-	print('payload: ' + str(buff[payloadPos+8:]))
+	#print('payload: ' + str(buff[payloadPos+8:]))
 	payload = buff[payloadPos+8:]
-	payload = urllib.unquote(payload)
+	payload = urllib.unquote_plus(payload)	# parse from url-encoded
 	json.loads(payload)
+	print('payload:')
 	print json.dumps(payload)
 
 
