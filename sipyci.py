@@ -45,31 +45,13 @@ def main():
 #		sys.exit(1)
 
 
-	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have
+	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have on port 80
 	s.listen(backlog)
 
 	print('Server is ready and listening on port ' + str(port))
 
-	while True:
-		client, address = s.accept()
-		data = client.recv(size)
+	waitForConnection()
 
-
-		print('client: ' + str(client))
-		print('address: ' + str(address))
-
-		if data:
-			print(data + 'end of data')
-			print('length of data: ' + str(len(data)))
-			client.send(data)
-			if (data[0:4] == 'pull'):			# This should change later when git hooks are used
-				print('Pulling from git...')
-				subprocess.call(gitPull, shell=True)
-			client.close()
-
-		client.close()
-
-	s.close()
 
 def parseInput(args):
 	foundpath = False
@@ -82,6 +64,7 @@ def parseInput(args):
 		if(arg == sys.argv[0]):
 			continue
 		if(arg[0:5] == 'port='):
+			foundport = True
 			port = int(arg[5:])
 		if(arg[0:5] == 'path='):
 			foundpath = True
@@ -93,6 +76,44 @@ def parseInput(args):
 		port = 5000
 
 	return port, path
+
+
+def waitForConnection():
+	print('waiting for connection...')
+	client, address = s.accept()
+	print address, ' connected'
+	receiveData(client, address)
+
+
+def receiveData(client, address):
+	buff = ''
+	while True:
+		data = client.recv(size)
+		buff += data
+
+		if not data: break
+
+		if data:
+#			print(data + 'end of data')
+			print('length of data: ' + str(len(data)))
+			if (data[0:4] == 'pull'):			# This should change later when git hooks are used
+				print('Pulling from git...')
+				subprocess.call(gitPull, shell=True)
+
+	client.close()
+
+	print('client disconnected')
+	print('length of buff: ' + str(len(buff)))
+	print('data received:')
+	print(buff)
+	parseBuffer(buff)
+	waitForConnection()
+
+
+def parseBuffer(buff):
+	payloadPos = buff.find('payload=')
+	print('found payload at position: ' + str(payloadPos))
+
 
 def handler(signum, frame):
 	print '\nSignal handler called with signal', signum
