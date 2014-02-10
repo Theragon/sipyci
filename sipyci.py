@@ -14,6 +14,7 @@ import sys
 import subprocess
 import json
 import urllib2
+from pprint import pprint
 
 repopath='/home/ru/NetCrawler'	#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
@@ -120,7 +121,8 @@ def parseBuffer(buff):
 	payload = urllib2.unquote(payload)
 	json.loads(payload)
 	print('payload:')
-	print json.dumps(payload)
+	#print json.dumps(payload)
+	pprint(payload)
 
 
 def handler(signum, frame):
