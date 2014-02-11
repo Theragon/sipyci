@@ -124,11 +124,12 @@ def parseBuffer(buff):
 	pprint(payload2)
 
 	print('payload keys:')
-	print(payload2.keys())
+	#print(payload2.keys())
 
 	print('payload values:')
-	print(payload2.values())
+	#print(payload2.values())
 
+	print('loop through dictionary:')
 	for item in payload2:
 		print payload2[item]
 
