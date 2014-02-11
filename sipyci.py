@@ -129,10 +129,11 @@ def parseBuffer(buff):
 	print('payload values:')
 	print(payload2.values())
 
-#	dictionary = payload2[0]
+	for item in payload2:
+		print payload2[item]
 
-	for k,v in payload2.items():
-		print k,v
+#	for k,v in payload2.items():
+#		print k,v
 
 
 def handler(signum, frame):
