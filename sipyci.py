@@ -91,7 +91,7 @@ def receiveData(client, address):
 		data = client.recv(size)
 		buff += data
 
-		if not data: break
+		#if not data: break
 
 		if data:
 #			print(data + 'end of data')
@@ -99,6 +99,12 @@ def receiveData(client, address):
 			if (data[0:4] == 'pull'):			# This should change later when git hooks are used
 				print('Pulling from git...')
 				subprocess.call(gitPull, shell=True)
+
+		elif not data:
+			break
+
+		elif data < size:
+			break
 
 	client.close()
 
@@ -125,8 +131,8 @@ def parseBuffer(buff):
 
 	dictionary = payload2[0]
 
-	for key in dictionary:
-		print key, 'corresponds to', dictionary[key]
+	for item in dictionary:
+		print item
 
 
 def handler(signum, frame):
