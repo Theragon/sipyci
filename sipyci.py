@@ -103,7 +103,7 @@ def receiveData(client, address):
 		elif not data:
 			break
 
-		elif data < size:
+		elif (len(data) < size):
 			break
 
 	client.close()
@@ -120,10 +120,9 @@ def parseBuffer(buff):
 	payloadPos = buff.find('payload=')
 	print('found payload at position: ' + str(payloadPos+8))
 
-	#print('payload: ' + str(buff[payloadPos+8:]))
 	payload = buff[payloadPos+8:]
 	#payload = urllib.unquote_plus(payload)	# parse from url-encoded
-	payload2 = urllib2.unquote(payload)
+	#payload2 = urllib2.unquote(payload)
 	json.loads(payload2)
 	print('payload:')
 	#print json.dumps(payload)
