@@ -100,9 +100,6 @@ def receiveData(client, address):
 				print('Pulling from git...')
 				subprocess.call(gitPull, shell=True)
 
-		elif (len(data) < size):
-			break
-
 		elif not data:
 			break
 
@@ -122,7 +119,7 @@ def parseBuffer(buff):
 
 	payload = buff[payloadPos+8:]
 	#payload = urllib.unquote_plus(payload)	# parse from url-encoded
-	#payload2 = urllib2.unquote(payload)
+	payload = urllib2.unquote(payload)
 	payload2 = json.loads(payload)
 	print('payload:')
 	#print json.dumps(payload)
