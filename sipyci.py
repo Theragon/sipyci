@@ -7,6 +7,7 @@ run example: ./sipyci port=90 path=/home/user/repo/
 run example: ./sipyci path=/full/path/to/repo
 port is optional, default port is 5000
 sudo to make sure you can open a port
+run as administrator on windows
 """
 
 import os
