@@ -25,7 +25,7 @@ gitdir='/home/logan/gitrepos/NetCrawler/.git'
 
 #git --work-tree=/repo/path --git-dir=/repo/path/.git pull origin master
 #gitPull = 'git --work-tree='+repopath+' --git-dir='+repopath+'/.git pull origin master'	#This is for ru.dev.lab
-gitPull = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
+#gitPull = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
 
 #path = ''
 host = ''		# '' means any address the machine happens to have
@@ -50,6 +50,7 @@ def main():
 		print('you must provide a path to repo')
 #		sys.exit(1)
 
+	gitPull = 'git --work-tree='+path+' --git-dir='+path+'/.git pull origin master'
 
 	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have on port 80
 	s.listen(backlog)
@@ -110,9 +111,9 @@ def receiveData(client, address):
 		if data:
 #			print(data + 'end of data')
 			print('length of data: ' + str(len(data)))
-			if (data[0:4] == 'pull'):			# This should change later when git hooks are used
-				print('Pulling from git...')
-				subprocess.call(gitPull, shell=True)
+			#if (data[0:4] == 'pull'):			# This should change later when git hooks are used
+				#print('Pulling from git...')
+				#subprocess.call(gitPull, shell=True)
 
 		elif not data:
 			break
@@ -149,6 +150,9 @@ def parseBuffer(buff):
 		print('loop through dictionary:')
 		for item in payload2:
 			print payload2[item]
+
+		print('Pulling from git...')
+		subprocess.call(gitPull, shell=True)
 
 	#	for k,v in payload2.items():
 	#		print k,v
