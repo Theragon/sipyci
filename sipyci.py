@@ -155,9 +155,9 @@ def parseBuffer(buff):
 			print payload2[item]
 
 		global gitPull
-		print('gitPull: ' + gitPull)
-		#print('Pulling from git...')
-		#subprocess.call(gitPull, shell=True)
+		#print('gitPull: ' + gitPull)
+		print('Pulling from git...')
+		subprocess.call(gitPull, shell=True)
 
 	#	for k,v in payload2.items():
 	#		print k,v
