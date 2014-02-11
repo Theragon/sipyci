@@ -117,14 +117,13 @@ def parseBuffer(buff):
 	#print('payload: ' + str(buff[payloadPos+8:]))
 	payload = buff[payloadPos+8:]
 	#payload = urllib.unquote_plus(payload)	# parse from url-encoded
-	payload = urllib2.unquote(payload)
-	json.loads(payload)
+	payload2 = urllib2.unquote(payload)
+	json.loads(payload2)
 	print('payload:')
 	#print json.dumps(payload)
-	pprint(payload)
+	pprint(payload2)
 
-	for key, value in payload.iteritems():
-		print key, value
+	dictionary = payload2[0]
 
 
 def handler(signum, frame):
