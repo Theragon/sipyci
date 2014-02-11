@@ -125,10 +125,10 @@ def parseBuffer(buff):
 	#print json.dumps(payload)
 	pprint(payload2)
 
-	dictionary = payload2[0]
+#	dictionary = payload2[0]
 
-	for item in dictionary:
-		print item
+#	for item in dictionary:
+#		print item
 
 
 def handler(signum, frame):
