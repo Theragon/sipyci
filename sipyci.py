@@ -5,8 +5,11 @@ A simple python CI server
 
 run example: ./sipyci port=90 path=/home/user/repo/
 run example: ./sipyci path=/full/path/to/repo
+port is optional, default port is 5000
+sudo to make sure you can open a port
 """
 
+import os
 import signal
 import socket
 import sys
@@ -34,7 +37,7 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 def main():
 	"""
 	Main function
-	parses input and enters a while true loop
+	parses input and waits for a connection
 	"""
 	path = ''
 	port = 5000
@@ -60,7 +63,7 @@ def parseInput(args):
 	foundport = False
 
 	for arg in sys.argv:
-		print(arg)
+		#print(arg)
 		if(arg == sys.argv[0]):
 			continue
 		if(arg[0:5] == 'port='):
@@ -75,7 +78,19 @@ def parseInput(args):
 	if(foundport == False):
 		port = 5000
 
+	checkPath(path)
+
 	return port, path
+
+
+def checkPath(path):
+	if os.path.exists(path):
+		print(path + ' exists')
+
+	if not os.path.exists(path):
+		print(path + ' does not exist')
+		print('please fix the path')
+		sys.exit(1)
 
 
 def waitForConnection():
@@ -113,28 +128,29 @@ def receiveData(client, address):
 
 def parseBuffer(buff):
 	payloadPos = buff.find('payload=')
-	print('found payload at position: ' + str(payloadPos+8))
 
-	payload = buff[payloadPos+8:]
-	#payload = urllib.unquote_plus(payload)	# parse from url-encoded
-	payload = urllib2.unquote(payload)
-	payload2 = json.loads(payload)
-	print('payload:')
-	#print json.dumps(payload)
-	pprint(payload2)
+	if(payloadPos != -1):
+		print('found payload at position: ' + str(payloadPos+8))
+		payload = buff[payloadPos+8:]
+		#payload = urllib.unquote_plus(payload)	# parse from url-encoded
+		payload = urllib2.unquote(payload)
+		payload2 = json.loads(payload)
+		print('payload:')
+		#print json.dumps(payload)
+		pprint(payload2)
 
-	print('payload keys:')
-	#print(payload2.keys())
+		print('payload keys:')
+		#print(payload2.keys())
 
-	print('payload values:')
-	#print(payload2.values())
+		print('payload values:')
+		#print(payload2.values())
 
-	print('loop through dictionary:')
-	for item in payload2:
-		print payload2[item]
+		print('loop through dictionary:')
+		for item in payload2:
+			print payload2[item]
 
-#	for k,v in payload2.items():
-#		print k,v
+	#	for k,v in payload2.items():
+	#		print k,v
 
 
 def handler(signum, frame):
