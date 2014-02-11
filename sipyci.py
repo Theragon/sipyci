@@ -9,7 +9,6 @@ port is optional, default port is 5000
 sudo to make sure you can open a port
 run as administrator on windows
 
-windows pull test
 """
 
 import os
