@@ -126,7 +126,7 @@ def parseBuffer(buff):
 	dictionary = payload2[0]
 
 	for key in dictionary:
-		print key, 'corresponds to', d[key]
+		print key, 'corresponds to', dictionary[key]
 
 
 def handler(signum, frame):
