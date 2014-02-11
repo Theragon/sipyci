@@ -91,8 +91,6 @@ def receiveData(client, address):
 		data = client.recv(size)
 		buff += data
 
-		#if not data: break
-
 		if data:
 #			print(data + 'end of data')
 			print('length of data: ' + str(len(data)))
@@ -125,9 +123,12 @@ def parseBuffer(buff):
 	#print json.dumps(payload)
 	pprint(payload2)
 
+	print('payload keys:')
+	print(payload2.keys())
+
 #	dictionary = payload2[0]
 
-#	for item in dictionary:
+#	for item in payload2:
 #		print item
 
 
