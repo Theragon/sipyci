@@ -50,7 +50,7 @@ def main():
 		print('you must provide a path to repo')
 #		sys.exit(1)
 
-	gitPull = 'git --work-tree='+path+' --git-dir='+path+'/.git pull origin master'
+	gitPull = 'git --work-tree='+path+' --git-dir='+path+'.git pull origin master'
 
 	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have on port 80
 	s.listen(backlog)
