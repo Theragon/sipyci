@@ -17,51 +17,66 @@ import signal
 import socket
 import sys
 import subprocess
+from subprocess import check_output
 import json
 import urllib2
 from pprint import pprint
 
-repopath='/home/ru/NetCrawler'	#This is for ru.dev.lab
+repopath='/home/ru/NetCrawler'		#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
 gitdir='/home/logan/gitrepos/NetCrawler/.git'
 
 #git --work-tree=/repo/path --git-dir=/repo/path/.git pull origin master
-#gitPull = 'git --work-tree='+repopath+' --git-dir='+repopath+'/.git pull origin master'	#This is for ru.dev.lab
-#gitPull = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
-gitPull = ''
+#pullString = 'git --work-tree='+repopath+' --git-dir='+repopath+'/.git pull origin master'	#This is for ru.dev.lab
+#pullString = 'git --work-tree='+worktree+' --git-dir='+gitdir+' pull origin master'
 
-#path = ''
-host = ''		# '' means any address the machine happens to have
-#port = 5000
-backlog = 5
+######################
+"""GLOBAL VARIABLES"""
+######################
+s = None
+path = ''
+host = ''		# '' means ANY address the machine happens to have
 size = 1024
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+port = 5000
+backlog = 5
+client = None
+address = None
+pullString = ''
+######################
+"""GLOBAL VARIABLES"""
+######################
 
 def main():
 	"""
 	Main function
-	parses input and waits for a connection
+	parses arguments
+	opens socket
+	binds to address
+	waits for connection
+	receives data
 	"""
-	path = ''
-	port = 5000
+
+	global path
+	global pullString
+	global port
 
 	if(len(sys.argv) > 1):
 		port, path = parseInput(sys.argv)
-		print('path to repo is: ' + path)
 	else:
-		print('you must provide a path to repo')
-#		sys.exit(1)
+		exit('A path to repository must at least be provided')
 
-	global gitPull
-	gitPull = 'git --work-tree='+path+' --git-dir='+path+'.git pull origin master'
+	#pullString = 'git --work-tree='+path+' --git-dir='+path+'.git pull origin master'
 
-	s.bind((host,port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have on port 80
-	s.listen(backlog)
+	openSocket()
+	bindToAddress()
+
+	createPullString()
 
 	print('Server is ready and listening on port ' + str(port))
 
-	waitForConnection()
+	while 1:
+		waitForConnection()
+		receiveData()
 
 
 def parseInput(args):
@@ -69,7 +84,6 @@ def parseInput(args):
 	foundport = False
 
 	for arg in sys.argv:
-		#print(arg)
 		if(arg == sys.argv[0]):
 			continue
 		if(arg[0:5] == 'port='):
@@ -80,9 +94,10 @@ def parseInput(args):
 			path = str(arg[5:])
 
 	if(foundpath == False):
-		print('you must provide a path to the repo')
+		exit('A path to repository must at least be provided')
 	if(foundport == False):
 		port = 5000
+		print('no port argument found, using default port 5000')
 
 	checkPath(path)
 
@@ -91,22 +106,65 @@ def parseInput(args):
 
 def checkPath(path):
 	if os.path.exists(path):
-		print(path + ' exists')
+		if sys.platform == 'linux' or sys.platform == 'linux2':		#linux
+			if(path[-1:] != '/'):
+				exit('path must end with a /')
+		elif sys.platform == 'win32' or sys.platform == 'cygwin':	#windows
+			if(path[-1:] != '\\'):
+				exit('path must end with a \\')
+		elif sys.platform == 'darwin':								#OS X
+			if(path[-1:] != '/'):
+				exit('path must end with a /')
+			
+	elif not os.path.exists(path):
+		exit('invalid path to repository')
 
-	if not os.path.exists(path):
-		print(path + ' does not exist')
-		print('please fix the path')
-		sys.exit(1)
+
+def exit(why):
+	print(why)
+	if s:
+		s.close()
+	sys.exit(1)
+
+
+def openSocket():
+	global s
+	try:
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	except socket.error, (value, message):
+		if s:
+			s.close()
+		else:
+			exit('failed to open socket: ' + message)
+
+
+def bindToAddress():
+	global s
+	try:
+		s.bind((host, port))	# s.bind(('', 80)) specifies that the socket is reachable by any address the machine happens to have on port 80
+		s.listen(backlog)
+	except socket.error, (value, message):
+		if s:
+			s.close()
+		else:
+			exit('failed to bind to address: ' + message)
+
+
+def createPullString():
+	global pullString
+	pullString = 'git --work-tree='+path+' --git-dir='+path+'.git pull origin master'
 
 
 def waitForConnection():
+	global client
+	global address
 	print('waiting for connection...')
 	client, address = s.accept()
 	print address, ' connected'
-	receiveData(client, address)
 
 
-def receiveData(client, address):
+def receiveData():
 	buff = ''
 	while True:
 		data = client.recv(size)
@@ -117,7 +175,7 @@ def receiveData(client, address):
 			print('length of data: ' + str(len(data)))
 			#if (data[0:4] == 'pull'):			# This should change later when git hooks are used
 				#print('Pulling from git...')
-				#subprocess.call(gitPull, shell=True)
+				#subprocess.call(pullString, shell=True)
 
 		elif not data:
 			break
@@ -127,12 +185,12 @@ def receiveData(client, address):
 	print('client disconnected')
 	print('length of buff: ' + str(len(buff)))
 	print('data received:')
-	print(buff)
+	#print(buff)
 	parseBuffer(buff)
-	waitForConnection()
 
 
 def parseBuffer(buff):
+	#global path
 	payloadPos = buff.find('payload=')
 
 	if(payloadPos != -1):
@@ -141,25 +199,29 @@ def parseBuffer(buff):
 		#payload = urllib.unquote_plus(payload)	# parse from url-encoded
 		payload = urllib2.unquote(payload)
 		payload2 = json.loads(payload)
-		print('payload:')
 		#print json.dumps(payload)
-		pprint(payload2)
+		#pprint(payload2)
 
-		print('payload keys:')
+		#print('payload keys:')
 		#print(payload2.keys())
 
-		print('payload values:')
+		#print('payload values:')
 		#print(payload2.values())
 
+		'''
 		print('loop through dictionary:')
 		for item in payload2:
 			print payload2[item]
+		'''
 
-		global gitPull
-		#print('gitPull: ' + gitPull)
+		global pullString
+		#print('pullString: ' + pullString)
 		print('Pulling from git...')
-		subprocess.call(gitPull, shell=True)
+		#p = subprocess.call(pullString, shell=True)
+		out = check_output(['git', '--work-tree='+path, '--git-dir='+path+'.git', 'pull', 'origin', 'master'])
+		#out, err = p.communicate()
 
+		print('output from shell: \n' + out)
 	#	for k,v in payload2.items():
 	#		print k,v
 
@@ -167,8 +229,9 @@ def parseBuffer(buff):
 def handler(signum, frame):
 	print '\nSignal handler called with signal', signum
 	print 'Shutting down server'
-	s.close()
-	sys.exit()
+	if s:
+		s.close()
+	sys.exit('sipyci successfully closed')
 
 signal.signal(signal.SIGINT, handler)
 
