@@ -17,3 +17,5 @@ step 2: make sure your machine/account has ssh access to your repo
 step 3: run the program like so
 unix: ./sipyci path=/home/user/path/to/repo/
 windows: python sipyci.py path=C:\path\to\repo\
+
+this is just a test
