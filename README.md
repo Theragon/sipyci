@@ -1,9 +1,11 @@
-siPyCI	-	A simple python CI server
+siPyCI
 =====================================
+A simple python CI server
 
 What do you need ?
 =====================================
 python 2.7
+
 git
 
 How do you use it ?
