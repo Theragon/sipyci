@@ -4,18 +4,16 @@ A simple python CI server
 
 What do you need ?
 =====================================
-python 2.7
+Python 2.7.
 
-git
+Git
 
 How do you use it ?
 =====================================
-clone your git repository in a
-directory you're satisfied with
+step 1: clone your git repository in a directory you're satisfied with
 
-make sure your machine/account has
-ssh access to your repo
+step 2: make sure your machine/account has ssh access to your repo
 
-run the program like so
+step 3: run the program like so
 unix: ./sipyci path=/home/user/path/to/repo/
 windows: python sipyci.py path=C:\path\to\repo\
