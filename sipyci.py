@@ -9,18 +9,19 @@ port is optional, default port is 5000
 sudo to make sure you can open a port
 run as administrator on windows
 
-
 """
 
 import os
+import sys
+import json
 import signal
 import socket
-import sys
-import subprocess
-from subprocess import check_output
-import json
+import inspect
 import urllib2
+import datetime
+import subprocess
 from pprint import pprint
+from subprocess import check_output
 
 repopath='/home/ru/NetCrawler'		#This is for ru.dev.lab
 worktree='/home/logan/tmp/CIserver'
@@ -33,15 +34,15 @@ gitdir='/home/logan/gitrepos/NetCrawler/.git'
 ######################
 """GLOBAL VARIABLES"""
 ######################
-s = None
-path = ''
+s = None		# socket object
+path = ''		# path to repository on server machine
 host = ''		# '' means ANY address the machine happens to have
-size = 1024
-port = 5000
-backlog = 5
-client = None
-address = None
-pullString = ''
+size = 1024		# maximum packet size
+port = 5000		# port for server to listen on
+backlog = 5 	# backlog
+client = None	# client that connects
+address = None	# address of client
+pullString = ''	# git command to pull from repo
 ######################
 """GLOBAL VARIABLES"""
 ######################
@@ -72,7 +73,7 @@ def main():
 
 	createPullString()
 
-	print('Server is ready and listening on port ' + str(port))
+	log('Server is ready and listening on port ', port)
 
 	while 1:
 		waitForConnection()
@@ -97,7 +98,7 @@ def parseInput(args):
 		exit('A path to repository must at least be provided')
 	if(foundport == False):
 		port = 5000
-		print('no port argument found, using default port 5000')
+		log('No port argument found, using default port 5000')
 
 	checkPath(path)
 
@@ -159,9 +160,10 @@ def createPullString():
 def waitForConnection():
 	global client
 	global address
-	print('waiting for connection...')
+	log('waiting for connection...')
 	client, address = s.accept()
-	print address, ' connected'
+	log(address[0],':',address[1], ' connected')
+	return 
 
 
 def receiveData():
@@ -171,8 +173,7 @@ def receiveData():
 		buff += data
 
 		if data:
-#			print(data + 'end of data')
-			print('length of data: ' + str(len(data)))
+			continue
 			#if (data[0:4] == 'pull'):			# This should change later when git hooks are used
 				#print('Pulling from git...')
 				#subprocess.call(pullString, shell=True)
@@ -182,19 +183,15 @@ def receiveData():
 
 	client.close()
 
-	print('client disconnected')
-	print('length of buff: ' + str(len(buff)))
-	print('data received:')
-	#print(buff)
+	log(address[0], ':', address[1], ' disconnected')
 	parseBuffer(buff)
 
 
 def parseBuffer(buff):
-	#global path
 	payloadPos = buff.find('payload=')
 
 	if(payloadPos != -1):
-		print('found payload at position: ' + str(payloadPos+8))
+		log('Payload received')
 		payload = buff[payloadPos+8:]
 		#payload = urllib.unquote_plus(payload)	# parse from url-encoded
 		payload = urllib2.unquote(payload)
@@ -226,12 +223,21 @@ def parseBuffer(buff):
 	#		print k,v
 
 
+def log(*args):
+	output = ''
+	for arg in args:
+		output += str(arg)
+	print(datetime.datetime.now().strftime('[%d.%m.%Y - %H:%M:%S] ') + output)
+
+
 def handler(signum, frame):
-	print '\nSignal handler called with signal', signum
-	print 'Shutting down server'
+	#print '\nSignal handler called with signal', signum
+	#print 'Shutting down server'
+	print('')
+	log('Shutting down server')
 	if s:
 		s.close()
-	sys.exit('sipyci successfully closed')
+	sys.exit(datetime.datetime.now().strftime('[%d.%m.%Y - %H:%M:%S] ') + 'sipyci successfully closed')
 
 signal.signal(signal.SIGINT, handler)
 
